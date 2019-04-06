@@ -102,3 +102,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+azureml-logs
+.azureml
+outputs
+azureml-setup
+aml_config
+assets
+.amlignore
