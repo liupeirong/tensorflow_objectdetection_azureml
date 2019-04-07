@@ -22,9 +22,9 @@ THRESHOLD = float(os.getenv('MIN_CONFIDENCE', '0.8'))
 def init():
   global logger
   global model
-  global data_collector
+  global pred_collector
   init_logger()
-  data_collector = ModelDataCollector(MODEL_NAME, identifier="imgpred", feature_names=["imageb64", "prediction"])
+  pred_collector = ModelDataCollector(MODEL_NAME, identifier="imgpred", feature_names=["detection"])
   model = load_model()
 
 def init_logger():
@@ -130,7 +130,9 @@ def inference(raw_data):
       })
     else:
       logger.debug('idx {} detection score too low {}'.format(idx, score))
-  #inputs_dc.collect([image_raw]) #can only be 2-d or list
-  data_collector.collect([1], result)
+  #TODO: store the input image in blob storage and get the path to the image as correlation_id for prediction
+  #for now simply generate an id that could be used for image file name in the future
+  image_id = '{}.jpg'.format(int(start_time))
+  pred_collector.collect(result, user_correlation_id=image_id)
   return result
 
