@@ -35,6 +35,9 @@ workspace_name = os.getenv('WORKSPACE_NAME')
 proj_datastore = os.getenv('PROJ_DATASTORE', default=None)
 compute_cpu = os.getenv('AML_AKS_CPU', default='akscpu')
 compute_gpu = os.getenv('AML_AKS_GPU', default='aksnv6')
+image_storage_account_name = os.getenv('IMAGE_STORAGE_ACCOUNT_NAME')
+image_storage_account_key = os.getenv('IMAGE_STORAGE_ACCOUNT_KEY')
+image_storage_container_name = os.getenv('IMAGE_STORAGE_CONTAINER_NAME')
 
 # constants
 DATA_SUBDIR='data'
@@ -81,6 +84,9 @@ with open("score.py", "rt") as fin:
     with open("mscore.py", "wt") as fout:
         for line in fin:
             fout.write(line.replace('__REPLACE_MODEL_NAME__', model_name))
+            fout.write(line.replace('__REPLACE_IMAGE_STORAGE_ACCOUNT_NAME__', image_storage_account_name))
+            fout.write(line.replace('__REPLACE_IMAGE_STORAGE_ACCOUNT_KEY__', image_storage_account_key))
+            fout.write(line.replace('__REPLACE_IMAGE_STORAGE_CONTAINER_NAME__', image_storage_container_name))
 
 image_config = ContainerImage.image_configuration(
     execution_script = "mscore.py",

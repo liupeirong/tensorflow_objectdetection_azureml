@@ -14,18 +14,25 @@ from PIL import Image
 
 from utils import label_map_util
 from azureml.monitoring import ModelDataCollector
+from azure.storage.blob import BlockBlobService
 
 MODEL_NAME = '__REPLACE_MODEL_NAME__'
 PASCAL_LABEL_MAP_FILE = 'pascal_label_map.pbtxt'
 THRESHOLD = float(os.getenv('MIN_CONFIDENCE', '0.8'))
+IMAGE_STORAGE_ACCOUNT_NAME = '__REPLACE_IMAGE_STORAGE_ACCOUNT_NAME__'
+IMAGE_STORAGE_ACCOUNT_KEY = '__REPLACE_IMAGE_STORAGE_ACCOUNT_KEY__'
+IMAGE_STORAGE_CONTAINER_NAME = '__REPLACE_IMAGE_STORAGE_CONTAINER_NAME__'
 
 def init():
   global logger
   global model
   global pred_collector
+  global blob_service
   init_logger()
   pred_collector = ModelDataCollector(MODEL_NAME, identifier="imgpred", feature_names=["detection"])
   model = load_model()
+  blob_service = BlockBlobService(IMAGE_STORAGE_ACCOUNT_NAME, IMAGE_STORAGE_ACCOUNT_KEY)
+  blob_service.create_container(IMAGE_STORAGE_CONTAINER_NAME) #fail_on_exist=False by default
 
 def init_logger():
   global logger
@@ -99,7 +106,8 @@ def inference(raw_data):
   parsed_json = json.loads(raw_data)
   image_raw = parsed_json['file']
   logger.info('base64 decode input image')
-  image = Image.open(BytesIO(base64.b64decode(image_raw)))
+  image_bytes = base64.b64decode(image_raw)
+  image = Image.open(BytesIO(image_bytes))
   logger.info('turn decoded image to np_array')
   (im_width, im_height) = image.size
   image_np = np.array(image.getdata()).reshape((im_height, im_width, 3)).astype(np.uint8)
@@ -130,9 +138,12 @@ def inference(raw_data):
       })
     else:
       logger.debug('idx {} detection score too low {}'.format(idx, score))
-  #TODO: store the input image in blob storage and get the path to the image as correlation_id for prediction
-  #for now simply generate an id that could be used for image file name in the future
-  image_id = '{}.jpg'.format(int(start_time))
+  #store the input image in blob storage and get the path to the image as correlation_id for prediction
+  image_id = '{}/{}.jpg'.format(MODEL_NAME, int(start_time))
+  StoreImage(image_id, image_bytes)
   pred_collector.collect(result, user_correlation_id=image_id)
   return result
 
+def StoreImage(image_id, image_bytes):
+  blob_service.create_blob_from_bytes(IMAGE_STORAGE_CONTAINER_NAME, image_id, image_bytes, 
+    content_settings=ContentSettings('image/jpeg'))
