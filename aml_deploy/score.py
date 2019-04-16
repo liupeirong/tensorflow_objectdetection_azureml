@@ -15,6 +15,7 @@ from PIL import Image
 from utils import label_map_util
 from azureml.monitoring import ModelDataCollector
 from azure.storage.blob import BlockBlobService
+from azure.storage.blob.models import ContentSettings
 
 MODEL_NAME = '__REPLACE_MODEL_NAME__'
 PASCAL_LABEL_MAP_FILE = 'pascal_label_map.pbtxt'
