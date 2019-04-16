@@ -94,6 +94,6 @@ tensorflog --logdir=./tflogs
   *  Highly available by leveraging Kubernetes
   *  Secured by an API key 
   *  Performance metrics are sent to App Insights for monitoring
-  *  Input data and inference results are [collected in Azure Blob Storage](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-enable-data-collection). In this example we are only generating a unique input image ID and store it with the inference results.
+  *  Input data and inference results are [collected in Azure Blob Storage](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-enable-data-collection). 
 3. To consume the web service, see an example at the end of the [aml-deploy Jupyter notebook](aml_deploy/aml-deploy.ipynb). 
 

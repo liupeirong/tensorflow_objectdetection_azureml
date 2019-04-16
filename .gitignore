@@ -110,3 +110,4 @@ azureml-setup
 aml_config
 assets
 .amlignore
+.idea
