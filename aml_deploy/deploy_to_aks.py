@@ -83,10 +83,11 @@ shutil.copy(pascal_label_map_in_ds, '.') #copy to current folder
 with open("score.py", "rt") as fin:
     with open("mscore.py", "wt") as fout:
         for line in fin:
-            fout.write(line.replace('__REPLACE_MODEL_NAME__', model_name))
-            fout.write(line.replace('__REPLACE_IMAGE_STORAGE_ACCOUNT_NAME__', image_storage_account_name))
-            fout.write(line.replace('__REPLACE_IMAGE_STORAGE_ACCOUNT_KEY__', image_storage_account_key))
-            fout.write(line.replace('__REPLACE_IMAGE_STORAGE_CONTAINER_NAME__', image_storage_container_name))
+            fout.write(line
+            .replace('__REPLACE_MODEL_NAME__', model_name)
+            .replace('__REPLACE_IMAGE_STORAGE_ACCOUNT_NAME__', image_storage_account_name)
+            .replace('__REPLACE_IMAGE_STORAGE_ACCOUNT_KEY__', image_storage_account_key)
+            .replace('__REPLACE_IMAGE_STORAGE_CONTAINER_NAME__', image_storage_container_name))
 
 image_config = ContainerImage.image_configuration(
     execution_script = "mscore.py",
